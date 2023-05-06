@@ -17,8 +17,8 @@ SRVR.Set('cert', fs.readFileSync('./demo/certs/selfsigned.crt'));
 SRVR.Instantiate();
 
 /* Обработка GET-маршрута */
-SRVR.Get('/', (request, response) => {
-    response.write('<b>Tested</d>');
+SRVR.Get('/[:id]', (request, response) => {
+    response.write('<meta charset="utf-8"><b>' + request.matches['id'] + '</d>');
 
     response.end();
 });
