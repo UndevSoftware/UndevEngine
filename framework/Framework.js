@@ -1,3 +1,4 @@
+const { IncomingMessage, ServerResponse } = require('http');
 const
     https = require('https'),
     fs = require('fs');
@@ -151,6 +152,14 @@ function Framework(/* Настройка окружения. dev - для раз
         this.cert;
 
         /**
+         * Все маршруты.
+         * 
+         * @public
+         * @type {Object[]}
+         */
+        this.routes = [];
+
+        /**
          * Изменение значений
          * 
          * @public
@@ -172,6 +181,185 @@ function Framework(/* Настройка окружения. dev - для раз
             this[key] = value;
 
             return this;
+        }
+
+        /**
+         * Создание сервера.
+         * 
+         * @public
+         * @returns {Server}
+         */
+        this.Instantiate = function() {
+            if (!this.key || !this.host) {
+                return console.error('Не задан ключ сертификата или сам сертификат.');
+            }
+
+            let _self = this;
+
+            /* Инициализация сервера */
+            this.instance = https.createServer({
+                key: _self.key,
+                cert: _self.cert
+            }, (request, response) => {
+                let body = '';
+
+                /* Если были найдены данные они будут записаны. */
+                request.on('data', (chunk) => {
+                    body += chunk.toString();
+                });
+
+                /* Начало обработки маршрута */
+                request.on('end', () => {
+                    if (body.length > 0) {
+                        request.body = body;
+                    }
+
+                    _self.Proccess(request, response);
+                });
+            });
+
+            return this;
+        }
+
+        /**
+         * Добавление GET-маршрута
+         * 
+         * @param {string} path 
+         * @param {Function} callback
+         * @returns {Server}
+         * @public
+         */
+        this.Get = function(path, callback) {
+            if (!path || typeof path !== 'string') {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Get("' + path + '", callback) -> Ошибка! Путь не указан или его тип не соответствует string');
+                }
+
+                return;
+            }
+
+            if (!callback || typeof callback !== 'function') {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Get("' + path + '", callback) -> Ошибка! Функция обратного вызова не указана или её тип не соответствует function');
+                }
+
+                return;
+            }
+
+            if (this.routes.find(item => item.path == path)) {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Get("' + path + '", callback) -> Ошибка! Указаный путь уже обрабатывается');
+                }
+
+                return;
+            }
+
+            this.routes.push({
+                method: 'GET',
+                path,
+                callback
+            });
+        }
+
+        /**
+         * Добавление POST-маршрута
+         * 
+         * @param {string} path 
+         * @param {Function} callback
+         * @returns {Server}
+         * @public
+         */
+        this.Post = function(path, callback) {
+            if (!path || typeof path !== 'string') {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Post("' + path + '", callback) -> Ошибка! Путь не указан или его тип не соответствует string');
+                }
+
+                return;
+            }
+
+            if (!callback || typeof callback !== 'function') {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Post("' + path + '", callback) -> Ошибка! Функция обратного вызова не указана или её тип не соответствует function');
+                }
+
+                return;
+            }
+
+            if (this.routes.find(item => item.path == path)) {
+                if (self.environmentStatus == 'dev') {
+                    console.warn('Post("' + path + '", callback) -> Ошибка! Указаный путь уже обрабатывается');
+                }
+
+                return;
+            }
+
+            this.routes.push({
+                method: 'POST',
+                path,
+                callback
+            });
+        }
+
+        /**
+         * Обработка маршрутов.
+         * 
+         * @public
+         * @param {IncomingMessage} request 
+         * @param {ServerResponse} response 
+         * @returns {Server}
+         */
+        this.Proccess = function(request, response) {
+            /**
+             * IP-адресс, с которого был сделан запрос.
+             * 
+             * @readonly
+             * @type {string}
+             */
+            request.ip = request.socket.remoteAddress;
+
+            /**
+             * Получение маршрута.
+             * 
+             * @public
+             * @type {object}
+             */
+            let route = self.routes.find((item) => {
+                return item.path == request.url && item.method == request.method;
+            });
+
+            if (!route) {
+                response.writeHead(404);
+
+                if (request.method === 'GET') {
+                    response.write('<b>Ошибка! Маршрут не найден!</b>');
+                }
+                else {
+                    request.write(JSON.stringify({
+                        ok: false,
+                        code: 404,
+                        message: 'Маршрут не найден'
+                    }));
+                }
+
+                return response.end();
+            }
+            else {
+                /**
+                 * Добавление заголовка с типом контента
+                 */
+                if (request.method !== 'POST') {
+                    response.setHeader('Content-Type', 'text/html');
+                }
+                else {
+                    response.setHeader('Content-Type', 'application/json');
+                }
+
+                /**
+                 * Вызов вашего метода
+                 */
+                route.callback(request, response);
+            }
         }
 
         return this;
