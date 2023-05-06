@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.0.2-alpha',
+    version: '0.1.2-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -325,12 +325,46 @@ function Framework(/* Настройка окружения. dev - для раз
             request.ip = request.socket.remoteAddress;
 
             /**
+             * Шаблоны в маршруте.
+             * 
+             * Пример использования.
+             * 
+             * ```js
+             * Framework.Get('/users/[:id]', () => { ... });
+             * ```
+             * 
+             * @public
+             * @type {{}}
+             */
+            request.matches = {};
+
+            /**
              * Получение маршрута.
              * 
              * @public
              * @type {object}
              */
             let route = this.routes.find((item) => {
+                if (/(\[:(.*?)\])/ig.test(item.path)) {
+                    let itemPathParsed = item.path.split('/');
+                    let requestPathParsed = request.url.split('/');
+
+                    itemPathParsed.forEach((component, index) => {
+                        if (/(\[:(.*?)\])/ig.test(component)) {
+                            let element = requestPathParsed[index];
+
+                            requestPathParsed[index] = component;
+
+                            let readyElement = component.replace(/(\[|\]|:)/ig, '');
+                            readyElement = readyElement.trim();
+
+                            request.matches[readyElement] = element;
+                        }
+                    });
+
+                    request.url = requestPathParsed.join('/')
+                }
+
                 return item.path == request.url && item.method == request.method;
             });
 
