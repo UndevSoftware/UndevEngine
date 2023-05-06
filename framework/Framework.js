@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.0.0-alpha',
+    version: '0.0.1-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -170,14 +170,6 @@ function Framework(/* Настройка окружения. dev - для раз
         this.Set = function(key, value) {
             let member = this[key];
 
-            if (member == undefined) {
-                if (self.environmentStatus == 'dev') {
-                    console.warn('Попытка изменить ключ ' + key + ' на ' + value + ' остановлена, так как ключ не найден');
-                }
-
-                return;
-            }
-
             this[key] = value;
 
             return this;
@@ -217,6 +209,20 @@ function Framework(/* Настройка окружения. dev - для раз
                     _self.Proccess(request, response);
                 });
             });
+
+            return this;
+        }
+
+        this.Listen = function() {
+            if (!this.instance instanceof https.Server) {
+                if (self.environmentStatus == 'dev') {
+                    console.error('Сервер не может быть запущен, так как его нет!\nИспользуйте .Instantiate()');
+                }
+
+                return;
+            }
+
+            this.instance.listen(this.port, this.host);
 
             return this;
         }
@@ -324,7 +330,7 @@ function Framework(/* Настройка окружения. dev - для раз
              * @public
              * @type {object}
              */
-            let route = self.routes.find((item) => {
+            let route = this.routes.find((item) => {
                 return item.path == request.url && item.method == request.method;
             });
 
@@ -373,3 +379,6 @@ function Framework(/* Настройка окружения. dev - для раз
      */
     return this;
 }
+
+exports.Meta = Meta;
+exports.Framework = Framework;
