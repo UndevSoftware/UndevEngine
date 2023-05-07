@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.4.10-alpha',
+    version: '0.5.10-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -86,6 +86,37 @@ function Framework(/* Настройка окружения. dev - для раз
         }
         else {
             this.environmentStatus = environmentStatus.toLowerCase();
+        }
+    }
+
+    if (this.environmentStatus === 'dev') {
+        /**
+         * Глобальный журнал для действий движка.
+         */
+        this.logs = [];
+
+        /**
+         * Добавление дейстий в журнал
+         * 
+         * @public
+         * @param {string} title 
+         * @param {string} message 
+         * @returns {Framework}
+         */
+        this.Log = function(title, message) {
+            if (!title || typeof title !== 'string') {
+                return console.warn('Невозможно создать запись. Заголовок не указан или указан неверно!');
+            }
+
+            if (!message || typeof message !== 'string') {
+                return console.warn('Невозможно создать запись. Сообщение не указан или указан неверно!');
+            }
+
+            this.logs.push({
+                title,
+                message,
+                date: Date.now()
+            });
         }
     }
 
