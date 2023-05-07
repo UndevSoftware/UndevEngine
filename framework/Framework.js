@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.3.4-alpha',
+    version: '0.3.5-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -176,8 +176,6 @@ function Framework(/* Настройка окружения. dev - для раз
          * @returns {Server}
          */
         this.Set = function(key, value) {
-            let member = this[key];
-
             this[key] = value;
 
             return this;
@@ -451,6 +449,17 @@ function Framework(/* Настройка окружения. dev - для раз
 
                 let content = fs.readFileSync(self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString();
                 readyToRender += content;
+
+                if (/\<include(.?*)\>/ig.test(readyToRender)) {
+                    readyToRender = readyToRender.replace(/\<include(.?*)\>/ig, (match) => {
+                        match = match.replace(/(include|\>|\<|href|\"|\=)/ig, '');
+                        match = match.trim();
+
+                        let replacment = fs.readFileSync(self.staticPath + (match[0] == '/' ? '' : '/') + match);
+
+                        return replacment;
+                    });
+                }
 
                 response.write(readyToRender);
 
