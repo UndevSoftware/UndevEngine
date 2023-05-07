@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.2.2-alpha',
+    version: '0.3.4-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -389,6 +389,18 @@ function Framework(/* Настройка окружения. dev - для раз
 
                         response.write(fs.readFileSync(this.staticPath + request.url));
                     }
+                    /* Обработка текстовых файлов */
+                    else if (extension === 'txt') {
+                        response.setHeader('Content-Type', 'text/plain');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url).toString());
+                    }
+                    /* Обработка json файлов */
+                    else if (extension === 'json') {
+                        response.setHeader('Content-Type', 'application/json');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url).toString());
+                    }
                     else {
                         response.writeHead(404);
                     }
@@ -411,6 +423,38 @@ function Framework(/* Настройка окружения. dev - для раз
          
                     return response.end();
                 }
+            }
+
+            /**
+             * Функция для серверной отрисовки файлов.
+             * 
+             * Поддерживаются только ehtml файлы.
+             * 
+             * @public
+             * @version unstable
+             * @param {string} fileName 
+             * @returns {Server}
+             */
+            response.render = function(fileName) {
+                let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
+                extension = extension[extension.length - 1];
+
+                if (extension !== 'ehtml') {
+                    if (self.environmentStatus === 'dev') {
+                        console.error('render(' + fileName + ') -> Расширение ' + extension + ' не поддерживается! Только ehtml');
+                    }
+
+                    return;
+                }
+
+                let readyToRender = '';
+
+                let content = fs.readFileSync(self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString();
+                readyToRender += content;
+
+                response.write(readyToRender);
+
+                return this;
             }
 
             /**
