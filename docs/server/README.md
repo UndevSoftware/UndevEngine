@@ -32,3 +32,20 @@ Framework.Get('/', (req, res) => {
   res.render('/ui/main.ehtml');
 });
 ```
+
+### Отправка файлов.
+
+Поддерживает следующие форматы:
+
+- html
+- xml
+- json
+- txt
+
+Для всего остального `Content-Type` будет равен `text/plain`. Пример:
+
+```js
+Framework.Get('/', (req, res) => {
+  res.sendFile('/ui/main.html');
+});
+```
