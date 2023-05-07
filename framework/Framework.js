@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.3.5-alpha',
+    version: '0.4.6-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -322,6 +322,8 @@ function Framework(/* Настройка окружения. dev - для раз
          * @returns {Server}
          */
         this.Proccess = function(request, response) {
+            const _self = this;
+
             /**
              * IP-адресс, с которого был сделан запрос.
              * 
@@ -329,6 +331,88 @@ function Framework(/* Настройка окружения. dev - для раз
              * @type {string}
              */
             request.ip = request.socket.remoteAddress;
+
+            /**
+             * Отправка файлов с сервера.
+             * 
+             * @public
+             * @param {string} fileName 
+             * @returns {Server}
+             */
+            response.sendFile = function(fileName) {
+                let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
+                extension = extension[extension.length - 1];
+
+                if (!fs.existsSync(_self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName)) {
+                    response.writeHead(404);
+                }
+                else {
+                    response.writeHead(200);
+
+                    if (['htm', 'html'].includes(extension)) {
+                        response.setHeader('Content-Type', 'text/html');
+                    }
+                    else if (extension === 'xml') {
+                        response.setHeader('Content-Type', 'text/xml');
+                    }
+                    else if (extension === 'txt') {
+                        response.setHeader('Content-Type', 'text/plain');
+                    }
+                    else if (extension === 'json') {
+                        response.setHeader('Content-Type', 'application/json');
+                    }
+                    else {
+                        response.setHeader('Content-Type', 'text/plain');
+                    }
+
+                    response.write(fs.readFileSync(_self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString());
+                }
+
+                return _self;
+            }
+
+            /**
+             * Функция для серверной отрисовки файлов.
+             * 
+             * Поддерживаются только ehtml файлы.
+             * 
+             * @public
+             * @version unstable
+             * @param {string} fileName 
+             * @returns {Server}
+             */
+            response.render = function(fileName) {
+                let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
+                extension = extension[extension.length - 1];
+
+                if (extension !== 'ehtml') {
+                    if (self.environmentStatus === 'dev') {
+                        console.error('render(' + fileName + ') -> Расширение ' + extension + ' не поддерживается! Только ehtml');
+                    }
+
+                    return;
+                }
+
+                let readyToRender = '';
+
+                let content = fs.readFileSync(self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString();
+                readyToRender += content;
+
+                if (/\<include(.?*)\>/ig.test(readyToRender)) {
+                    readyToRender = readyToRender.replace(/\<include(.?*)\>/ig, (match) => {
+                        match = match.replace(/(include|\>|\<|href|\"|\=)/ig, '');
+                        match = match.trim();
+
+                        let replacment = fs.readFileSync(self.staticPath + (match[0] == '/' ? '' : '/') + match);
+
+                        return replacment;
+                    });
+                }
+
+                response.write(readyToRender);
+
+                return this;
+            }
 
             /* Обработка link, script, img и др. запросов */
             if (/(\.)/g.test(request.url)) {
@@ -421,49 +505,6 @@ function Framework(/* Настройка окружения. dev - для раз
          
                     return response.end();
                 }
-            }
-
-            /**
-             * Функция для серверной отрисовки файлов.
-             * 
-             * Поддерживаются только ehtml файлы.
-             * 
-             * @public
-             * @version unstable
-             * @param {string} fileName 
-             * @returns {Server}
-             */
-            response.render = function(fileName) {
-                let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
-                extension = extension[extension.length - 1];
-
-                if (extension !== 'ehtml') {
-                    if (self.environmentStatus === 'dev') {
-                        console.error('render(' + fileName + ') -> Расширение ' + extension + ' не поддерживается! Только ehtml');
-                    }
-
-                    return;
-                }
-
-                let readyToRender = '';
-
-                let content = fs.readFileSync(self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString();
-                readyToRender += content;
-
-                if (/\<include(.?*)\>/ig.test(readyToRender)) {
-                    readyToRender = readyToRender.replace(/\<include(.?*)\>/ig, (match) => {
-                        match = match.replace(/(include|\>|\<|href|\"|\=)/ig, '');
-                        match = match.trim();
-
-                        let replacment = fs.readFileSync(self.staticPath + (match[0] == '/' ? '' : '/') + match);
-
-                        return replacment;
-                    });
-                }
-
-                response.write(readyToRender);
-
-                return this;
             }
 
             /**
