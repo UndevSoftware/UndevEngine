@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.1.2-alpha',
+    version: '0.2.2-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -158,6 +158,14 @@ function Framework(/* Настройка окружения. dev - для раз
          * @type {Object[]}
          */
         this.routes = [];
+
+        /**
+         * Корневая директория проекта.
+         * 
+         * @public
+         * @type {string}
+         */
+        this.staticPath = './';
 
         /**
          * Изменение значений
@@ -323,6 +331,87 @@ function Framework(/* Настройка окружения. dev - для раз
              * @type {string}
              */
             request.ip = request.socket.remoteAddress;
+
+            /* Обработка link, script, img и др. запросов */
+            if (/(\.)/g.test(request.url)) {
+                /* Получение расширения файла */
+                let extension = request.url.split('/')[request.url.split('/').length - 1].split('.');
+                extension = extension[extension.length - 1];
+
+                /**
+                 * sec-fetch-user - заголовок https (ТОЛЬКО) запрсоов
+                 * который опередляет того кто выполнил запрос.
+                 * 
+                 * ?1 - Бразуер
+                 * ?0 - Пользователь
+                 * 
+                 * Данная система нужна для защиты файлов сервера от
+                 * листинга. Будет выдана ошибка 405 (Access Denied)
+                 */
+                if (request.headers['sec-fetch-user'] !== '?1') {
+                    /* Обработка CSS-файлов */
+                    if (extension === 'css') {
+                        response.setHeader('Content-Type', 'text/css');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url).toString());
+                    }
+                    /* Обработка JS-файлов */
+                    else if (extension === 'js') {
+                        response.setHeader('Content-Type', 'text/javascript');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url).toString());
+                    }
+                    /* Обработка медиа-файлов */
+                    else if (['jpg', 'jpeg'].includes(extension)) {
+                        response.setHeader('Content-Type', 'image/jpeg');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url));
+                    }
+                    else if (['png', 'webp'].includes(extension)) {
+                        response.setHeader('Content-Type', 'image/' + extension);
+
+                        response.write(fs.readFileSync(this.staticPath + request.url));
+                    }
+                    /* Обработка аудио-файлов */
+                    else if (extension === 'mp3') {
+                        response.setHeader('Content-Type', 'audio/mpeg');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url));
+                    }
+                    else if (extension === 'ogg') {
+                        response.setHeader('Content-Type', 'audio/ogg');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url));
+                    }
+                    /* Обработка видео-файлов */
+                    else if (extension === 'mp4') {
+                        response.setHeader('Content-Type', 'video/mp4');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url));
+                    }
+                    else {
+                        response.writeHead(404);
+                    }
+
+                    return response.end();
+                }
+                else {
+                    response.writeHead(405);
+
+                    if (request.method === 'GET') {
+                        response.write('<b>Access denied</b>');
+                    }
+                    else {
+                        response.write(JSON.stringify({
+                           ok: false,
+                           status: 405,
+                           message: 'Доступ запрещён!'
+                        }));
+                    }
+         
+                    return response.end();
+                }
+            }
 
             /**
              * Шаблоны в маршруте.
