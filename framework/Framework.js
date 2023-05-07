@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '0.4.9-alpha',
+    version: '0.4.10-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -347,8 +347,6 @@ function Framework(/* Настройка окружения. dev - для раз
                     response.writeHead(404);
                 }
                 else {
-                    response.writeHead(200);
-
                     if (['htm', 'html'].includes(extension)) {
                         response.setHeader('Content-Type', 'text/html');
                     }
@@ -365,6 +363,7 @@ function Framework(/* Настройка окружения. dev - для раз
                         response.setHeader('Content-Type', 'text/plain');
                     }
 
+                    response.writeHead(200);
                     response.write(fs.readFileSync(_self.staticPath + (fileName[0] == "/" ? "" : "/") + fileName).toString());
                 }
 
