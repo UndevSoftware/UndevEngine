@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '1.8.17-alpha',
+    version: '1.9.26-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -447,7 +447,14 @@ function Framework(/* Настройка окружения. dev - для раз
             /* Обработка link, script, img и др. запросов */
             if (/(\.)/g.test(request.url)) {
                 /* Получение расширения файла */
-                let extension = request.url.split('/')[request.url.split('/').length - 1].split('.');
+                let extension = request.url.split('/')[request.url.split('/').length - 1];
+
+                if (extension.includes('?')) {
+                    extension = extension.split('?')[0];
+                }
+
+                extension = extension.split('.');
+
                 extension = extension[extension.length - 1];
 
                 /**
@@ -512,6 +519,25 @@ function Framework(/* Настройка окружения. dev - для раз
                         response.setHeader('Content-Type', 'application/json');
 
                         response.write(fs.readFileSync(this.staticPath + request.url).toString());
+                    }
+                    /* Шифты */
+                    else if (extension.includes('ttf')) {
+                        response.setHeader('Content-Type', 'application/x-font-ttf');
+
+                        request.url = request.url.split('');
+                        request.url.splice(request.url.indexOf('?'), 10);
+                        request.url = request.url.join('');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url), 'binary');
+                    }
+                    else if (extension.includes('woff')) {
+                        response.setHeader('Content-Type', 'application/x-font-woff');
+
+                        request.url = request.url.split('');
+                        request.url.splice(request.url.indexOf('?'), 10);
+                        request.url = request.url.join('');
+
+                        response.write(fs.readFileSync(this.staticPath + request.url), 'binary');
                     }
                     else {
                         response.writeHead(404);
