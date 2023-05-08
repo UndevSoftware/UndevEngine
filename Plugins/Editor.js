@@ -12,6 +12,7 @@
  * @public
  * @author Максим Рулетов (ruletkasuperstar)
  * @param {Element} element
+ * @returns {Editor}
  */
 function Editor(
     /* Родительский элемент, к которому будет пристроен редактор */
@@ -41,4 +42,29 @@ function Editor(
 
         this.element = element;
     }
+
+    /**
+     * Генерация интерфейса редактора.
+     * 
+     * @public
+     * @param {Element} inElement
+     * @returns {Editor}
+     */
+    this.GenerateUI = function(inElement) {
+        let EditorMainBlock = document.createElement('div');
+            EditorMainBlock.classList.add("editor", "editor-standard-theme");
+
+        if (inElement && inElement instanceof Element) {
+            if (!element.contains(inElement)) {
+                element.append(inElement);
+            }
+
+            inElement.append(EditorMainBlock);
+        }
+        else {
+            this.element.append(EditorMainBlock);
+        }
+    }
+
+    return this;
 };
