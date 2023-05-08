@@ -57,6 +57,24 @@ function Editor(
         let EditorActive = document.createElement('div');
             EditorActive.classList.add('editor-tools', 'editor-standard-theme');
 
+        let EditorLeft = document.createElement('div');
+            EditorLeft.classList.add('editor-tools__left');
+        let EditorRight = document.createElement('div');
+            EditorRight.classList.add('editor-tools__right');
+
+        let EditorBoldButton = document.createElement('span')
+            EditorBoldButton.classList.add('fa', 'fa-bold', 'editor-standard-theme-color');
+        let EditorItalicButton = document.createElement('span')
+            EditorItalicButton.classList.add('fa', 'fa-italic', 'editor-standard-theme-color');
+        let EditorUnderlineButton = document.createElement('span')
+            EditorUnderlineButton.classList.add('fa', 'fa-underline', 'editor-standard-theme-color');
+        let EditorStrikedButton = document.createElement('span')
+            EditorStrikedButton.classList.add('fa', 'fa-strikethrough', 'editor-standard-theme-color');
+
+        EditorLeft.append(EditorBoldButton, EditorItalicButton, EditorUnderlineButton, EditorStrikedButton);
+
+        EditorActive.append(EditorLeft, EditorRight);
+
         EditorMainBlock.append(EditorActive);
 
         if (inElement && inElement instanceof Element) {
