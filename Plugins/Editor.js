@@ -52,7 +52,12 @@ function Editor(
      */
     this.GenerateUI = function(inElement) {
         let EditorMainBlock = document.createElement('div');
-            EditorMainBlock.classList.add("editor", "editor-standard-theme");
+            EditorMainBlock.classList.add('editor-block');
+
+        let EditorActive = document.createElement('div');
+            EditorActive.classList.add('editor-tools', 'editor-standard-theme');
+
+        EditorMainBlock.append(EditorActive);
 
         if (inElement && inElement instanceof Element) {
             if (!element.contains(inElement)) {
