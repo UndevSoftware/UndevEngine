@@ -8,10 +8,14 @@
         <title>Главная</title>
     </head>
     <body>
-        <div id="root"></div>
+        <div id="root">
+            <div class="root__editor"></div>
+        </div>
 
         <script>
             let editor = new Editor(document.querySelector('#root'));
+
+            editor.GenerateUI(document.querySelector('.root__editor'));
         </script>
     </body>
 </html>
