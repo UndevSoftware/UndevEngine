@@ -1,0 +1,17 @@
+.editor-block {
+    width: 80%;
+    min-height: 40px;
+    margin: 0 auto;
+    margin-top: 20px;
+}
+
+.editor-tools {
+    width: 100%;
+    height: 40px;
+    outline: none;
+}
+
+.editor-standard-theme {
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .70);
+}
