@@ -1,0 +1,96 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+body {
+  --mainBackgroundColor: #222;
+  background-color: var(--mainBackgroundColor);
+}
+.editor-wrapper {
+  padding: 25px;
+}
+@media (min-width: 992px) {
+  .editor-wrapper {
+    max-width: 1250px;
+    margin: 0 auto;
+    padding: 50px;
+  }
+}
+#toolbar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+  grid-gap: 15px 5px;
+  margin-bottom: 25px;
+}
+#toolbar .action {
+  --buttonBorderRadius: 5px;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+  border-radius: var(--buttonBorderRadius);
+  color: #fff;
+  transition: background-color ease 250ms;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#toolbar .action:hover {
+  background-color: #444;
+}
+#toolbar .action i {
+  pointer-events: none;
+}
+#toolbar .action.has-submenu {
+  position: relative;
+}
+#toolbar .action.has-submenu, #toolbar .action.has-submenu .submenu {
+  background-color: var(--mainBackgroundColor);
+}
+#toolbar .action.has-submenu .submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  border-radius: 0 0 var(--buttonBorderRadius) var(--buttonBorderRadius);
+  z-index: 1;
+  display: none;
+}
+#toolbar .action.has-submenu .submenu.visible {
+  display: block;
+}
+#content {
+  min-height: 500px;
+  color: #fff;
+  padding: 15px;
+  border: 1px solid #888;
+  border-radius: 5px;
+  margin: 15px auto;
+  background-color: #333;
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+#content:focus {
+  outline: none;
+  border-color: #888;
+}
+#content ul, #content ol {
+  display: inline-block;
+  padding-left: 30px;
+}
+#content img {
+  display: block;
+  max-width: 100%;
+}
+#content a {
+  color: #0ff;
+}
+#image-upload-input {
+  display: none;
+}
