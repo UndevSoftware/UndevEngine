@@ -53,34 +53,22 @@ function Editor(
         {
             name: 'bold',
             icon: 'fa-bold',
-            title: {
-                en: 'Bold',
-                ru: 'Жирный'
-            }
+            title: 'Жирный'
         },
         {
             name: 'italic',
             icon: 'fa-italic',
-            title: {
-                en: 'Italic',
-                ru: 'Курсивный'
-            }
+            title: 'Курсивный'
         },
         {
             name: 'underline',
             icon: 'fa-underline',
-            title: {
-                en: 'Underlined',
-                ru: 'Подчёркнутый'
-            }
+            title: 'Подчёркнутый'
         },
         {
             name: 'strikethrough',
             icon: 'fa-strikethrough',
-            title: {
-                en: 'Strikethrough',
-                ru: 'Зачёркнутый'
-            }
+            title: 'Зачёркнутый'
         }
     ]);
 
@@ -90,38 +78,83 @@ function Editor(
      * @public
      * @type {Element}
      */
-    this.editorViewport;
+    this.editorViewport = document.createElement('div');
+
+    /**
+     * Панель с инструментами
+     * 
+     * @public
+     * @type {Element}
+     */
+    this.editorToolBar = document.createElement('div');
+
+    /**
+     * Контейнер для редактора.
+     * 
+     * @public
+     * @type {Element}
+     */
+    this.editorWrapper = document.createElement('div');
 
     const self = this;
 
     /**
      * Создание кнопки с инструментом
+     * 
      * @param {{}} action 
      * @returns {Element}
      */
     this.CreateActionButton = function(action) {
-        const span = document.createElement('span');
+        const button = document.createElement("button");
+        const i = document.createElement("i");
 
-        span.classList.add('fa', 'editor-standard-theme-color', 'editor-standard-theme-button-hover', action.icon);
-        span.title = action.title;
-        span.dataset.action = action.name;
+        button.classList.add("action");
+        button.title = action.title;
+        button.dataset.action = action.name;
 
-        span.addEventListener('click', this.HandleAction);
+        if (action.style) button.dataset.style = action.style;
+        if (action.tag) button.dataset.style = action.tag;
 
-        return span;
+        button.addEventListener("click", this.HandleAction);
+
+        i.classList.add("fa", action.icon);
+        button.append(i);
+
+        return button;
     }
 
     /**
      * Обработка нажатия на инструмент
-     * @param {Event} event 
+     * @param {Event} e 
      */
-    this.HandleAction = function(event) {
-        const target = event.currentTarget;
+    this.HandleAction = function(e) {
+        const target = e.currentTarget;
         const action = target.dataset.action;
 
         self.editorViewport.focus();
 
         switch (action) {
+            case "insertImageByUrl":
+                const imageUrl = prompt("Insert the image URL");
+
+                if (imageUrl) {
+                    document.execCommand("insertImage", false, imageUrl);
+                }
+
+                break;
+            case "insertImageByFile":
+                const fileUploadInput = document.querySelector("#image-upload-input");
+
+                fileUploadInput.click();
+
+                fileUploadInput.onchange = () => {
+                    const [file] = fileUploadInput.files;
+
+                    if (file)
+                        document.execCommand("insertImage", false, URL.createObjectURL(file));
+                };
+
+                break;
             default:
                 document.execCommand(action, false);
                 break;
@@ -139,46 +172,58 @@ function Editor(
         /**
          * Главный блок редактора. Обрамляет все его части
          */
-        let EditorMainBlock = document.createElement('div');
-            EditorMainBlock.classList.add('editor-block');
+        this.editorWrapper.classList.add('editor-wrapper');
 
         /**
          * Viewport редактора
          */
-        let EditorViewport = document.createElement('div');
-            EditorViewport.classList.add('editor-viewport', 'editor-standard-theme');
-            EditorViewport.contentEditable = true;
-
-        this.editorViewport = EditorViewport;
+        this.editorViewport.classList.add('editor-viewport', 'editor-standard-theme');
+        this.editorViewport.contentEditable = true;
 
         /**
          * Панель инструментов
          */
-        let EditorToolbar = document.createElement('div');
-        EditorToolbar.classList.add('editor-tools', 'editor-standard-theme');
+        this.editorToolBar.classList.add('editor-tools', 'editor-standard-theme');
 
         /**
          * Кнопки инструментов
          */
         for (const action of this.actions) {
-            const toolButton = this.CreateActionButton(action);
-
-            EditorToolbar.append(toolButton);
+            const actionButton = this.CreateActionButton(action);
+        
+            if (action.submenu) {
+                const submenu = document.createElement("div");
+        
+                submenu.classList.add("submenu");
+        
+                for (const subaction of action.submenu) {
+                    const subActionButton = this.CreateActionButton(subaction);
+                    submenu.append(subActionButton);
+                }
+        
+                actionButton.addEventListener("click", (e) => {
+                    e.preventDefault();
+                    submenu.classList.toggle("visible");
+                });
+        
+                actionButton.classList.add("has-submenu");
+                actionButton.append(submenu);
+            }
+        
+            this.editorToolBar.append(actionButton);
         }
 
-        EditorMainBlock.append(EditorToolbar);
-
-        EditorMainBlock.append(EditorViewport);
+        this.editorWrapper.append(this.editorToolBar, this.editorViewport);
 
         if (inElement && inElement instanceof Element) {
             if (!element.contains(inElement)) {
                 element.append(inElement);
             }
 
-            inElement.append(EditorMainBlock);
+            inElement.append(this.editorWrapper);
         }
         else {
-            this.element.append(EditorMainBlock);
+            this.element.append(this.editorWrapper);
         }
     }
 
