@@ -5,3 +5,4 @@
 - [✔ Базовые концепции](https://github.com/UndevSoftware/UndevEngine/blob/main/docs/basics/README.md)
 - [🖥 Серверная часть](https://github.com/UndevSoftware/UndevEngine/tree/main/docs/server/README.md)
 - [⭐ EHTML](https://github.com/UndevSoftware/UndevEngine/tree/main/docs/ehtml/README.md)
+- [✏ WYSIWYG-редактор](https://github.com/UndevSoftware/UndevEngine/blob/main/docs/editor/README.md)
