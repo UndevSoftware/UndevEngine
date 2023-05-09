@@ -51,31 +51,60 @@ function Editor(
      * @returns {Editor}
      */
     this.GenerateUI = function(inElement) {
+        /**
+         * Главный блок редактора. Обрамляет все его части
+         */
         let EditorMainBlock = document.createElement('div');
             EditorMainBlock.classList.add('editor-block');
 
+        /**
+         * Панель инструментов
+         */
         let EditorActive = document.createElement('div');
             EditorActive.classList.add('editor-tools', 'editor-standard-theme');
 
+        /**
+         * Разделение панели инструментов на 2 части
+         */
         let EditorLeft = document.createElement('div');
             EditorLeft.classList.add('editor-tools__left');
         let EditorRight = document.createElement('div');
             EditorRight.classList.add('editor-tools__right');
 
+        /**
+         * Кнопки инструментов
+         */
         let EditorBoldButton = document.createElement('span')
-            EditorBoldButton.classList.add('fa', 'fa-bold', 'editor-standard-theme-color');
+            EditorBoldButton.classList.add('fa', 'fa-bold', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
+            EditorBoldButton.id = "bold";
+            EditorBoldButton.setAttribute('data-type', 'bold');
         let EditorItalicButton = document.createElement('span')
-            EditorItalicButton.classList.add('fa', 'fa-italic', 'editor-standard-theme-color');
+            EditorItalicButton.classList.add('fa', 'fa-italic', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
+            EditorItalicButton.id = "italic";
+            EditorItalicButton.setAttribute('data-type', 'italic');
         let EditorUnderlineButton = document.createElement('span')
-            EditorUnderlineButton.classList.add('fa', 'fa-underline', 'editor-standard-theme-color');
+            EditorUnderlineButton.classList.add('fa', 'fa-underline', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
+            EditorUnderlineButton.id = "underline";
+            EditorUnderlineButton.setAttribute('data-type', 'underline');
         let EditorStrikedButton = document.createElement('span')
-            EditorStrikedButton.classList.add('fa', 'fa-strikethrough', 'editor-standard-theme-color');
+            EditorStrikedButton.classList.add('fa', 'fa-strikethrough', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
+            EditorStrikedButton.id = "strikethrough";
+            EditorStrikedButton.setAttribute('data-type', 'strikethrough');
 
         EditorLeft.append(EditorBoldButton, EditorItalicButton, EditorUnderlineButton, EditorStrikedButton);
 
         EditorActive.append(EditorLeft, EditorRight);
 
         EditorMainBlock.append(EditorActive);
+
+        /**
+         * Viewport редактора
+         */
+        let EditorViewport = document.createElement('div');
+            EditorViewport.classList.add('editor-viewport', 'editor-standard-theme');
+            EditorViewport.contentEditable = true;
+
+        EditorMainBlock.append(EditorViewport);
 
         if (inElement && inElement instanceof Element) {
             if (!element.contains(inElement)) {
