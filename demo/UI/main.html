@@ -20,62 +20,6 @@
             let editor = new Editor(document.querySelector('#root'));
 
             editor.GenerateUI(document.querySelector('.root__editor'));
-
-            function setCaret(el) {
-                let range = document.createRange(),
-                    sel = window.getSelection(),
-                    lastKnownIndex = -1;
-                for (let i = 0; i < el.childNodes.length; i++) {
-                    if (isTextNodeAndContentNoEmpty(el.childNodes[i])) {
-                        lastKnownIndex = i;
-                    }
-                }
-                if (lastKnownIndex === -1) {
-                    throw new Error('Could not find valid text content');
-                }
-
-                let row = el.childNodes[lastKnownIndex],
-                    col = row.textContent.length;
-
-                range.setStart(row, col);
-                range.collapse(true);
-
-                sel.removeAllRanges();
-                sel.addRange(range);
-                el.focus();
-            }
-
-            function isTextNodeAndContentNoEmpty(node) {
-                return node.nodeType == Node.TEXT_NODE && node.textContent.trim().length > 0
-            }
-
-            window.onload = () => {
-                const editorViewport = document.querySelector('.editor-viewport');
-
-                document.querySelector('#bold').addEventListener('click', (event) => {
-                    editorViewport.focus();
-
-                    document.execCommand('bold', false);
-                });
-
-                document.querySelector('#italic').addEventListener('click', (event) => {
-                    editorViewport.focus();
-
-                    document.execCommand('italic', false);
-                });
-
-                document.querySelector('#underline').addEventListener('click', (event) => {
-                    editorViewport.focus();
-
-                    document.execCommand('underline', false);
-                });
-
-                document.querySelector('#strikethrough').addEventListener('click', (event) => {
-                    editorViewport.focus();
-
-                    document.execCommand('strikeThrough', false);
-                });
-            }
         </script>
     </body>
 </html>

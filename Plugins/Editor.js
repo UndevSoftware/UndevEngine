@@ -44,6 +44,91 @@ function Editor(
     }
 
     /**
+     * Полная колекция возможностей редактора.
+     * 
+     * @readonly
+     * @type {Array}
+     */
+    this.actions = Object.freeze([
+        {
+            name: 'bold',
+            icon: 'fa-bold',
+            title: {
+                en: 'Bold',
+                ru: 'Жирный'
+            }
+        },
+        {
+            name: 'italic',
+            icon: 'fa-italic',
+            title: {
+                en: 'Italic',
+                ru: 'Курсивный'
+            }
+        },
+        {
+            name: 'underline',
+            icon: 'fa-underline',
+            title: {
+                en: 'Underlined',
+                ru: 'Подчёркнутый'
+            }
+        },
+        {
+            name: 'strikethrough',
+            icon: 'fa-strikethrough',
+            title: {
+                en: 'Strikethrough',
+                ru: 'Зачёркнутый'
+            }
+        }
+    ]);
+
+    /**
+     * Содержимое контента
+     * 
+     * @public
+     * @type {Element}
+     */
+    this.editorViewport;
+
+    const self = this;
+
+    /**
+     * Создание кнопки с инструментом
+     * @param {{}} action 
+     * @returns {Element}
+     */
+    this.CreateActionButton = function(action) {
+        const span = document.createElement('span');
+
+        span.classList.add('fa', 'editor-standard-theme-color', 'editor-standard-theme-button-hover', action.icon);
+        span.title = action.title;
+        span.dataset.action = action.name;
+
+        span.addEventListener('click', this.HandleAction);
+
+        return span;
+    }
+
+    /**
+     * Обработка нажатия на инструмент
+     * @param {Event} event 
+     */
+    this.HandleAction = function(event) {
+        const target = event.currentTarget;
+        const action = target.dataset.action;
+
+        self.editorViewport.focus();
+
+        switch (action) {
+            default:
+                document.execCommand(action, false);
+                break;
+        }
+    }
+
+    /**
      * Генерация интерфейса редактора.
      * 
      * @public
@@ -58,51 +143,30 @@ function Editor(
             EditorMainBlock.classList.add('editor-block');
 
         /**
-         * Панель инструментов
-         */
-        let EditorActive = document.createElement('div');
-            EditorActive.classList.add('editor-tools', 'editor-standard-theme');
-
-        /**
-         * Разделение панели инструментов на 2 части
-         */
-        let EditorLeft = document.createElement('div');
-            EditorLeft.classList.add('editor-tools__left');
-        let EditorRight = document.createElement('div');
-            EditorRight.classList.add('editor-tools__right');
-
-        /**
-         * Кнопки инструментов
-         */
-        let EditorBoldButton = document.createElement('span')
-            EditorBoldButton.classList.add('fa', 'fa-bold', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
-            EditorBoldButton.id = "bold";
-            EditorBoldButton.setAttribute('data-type', 'bold');
-        let EditorItalicButton = document.createElement('span')
-            EditorItalicButton.classList.add('fa', 'fa-italic', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
-            EditorItalicButton.id = "italic";
-            EditorItalicButton.setAttribute('data-type', 'italic');
-        let EditorUnderlineButton = document.createElement('span')
-            EditorUnderlineButton.classList.add('fa', 'fa-underline', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
-            EditorUnderlineButton.id = "underline";
-            EditorUnderlineButton.setAttribute('data-type', 'underline');
-        let EditorStrikedButton = document.createElement('span')
-            EditorStrikedButton.classList.add('fa', 'fa-strikethrough', 'editor-standard-theme-color', 'editor-standard-theme-button-hover');
-            EditorStrikedButton.id = "strikethrough";
-            EditorStrikedButton.setAttribute('data-type', 'strikethrough');
-
-        EditorLeft.append(EditorBoldButton, EditorItalicButton, EditorUnderlineButton, EditorStrikedButton);
-
-        EditorActive.append(EditorLeft, EditorRight);
-
-        EditorMainBlock.append(EditorActive);
-
-        /**
          * Viewport редактора
          */
         let EditorViewport = document.createElement('div');
             EditorViewport.classList.add('editor-viewport', 'editor-standard-theme');
             EditorViewport.contentEditable = true;
+
+        this.editorViewport = EditorViewport;
+
+        /**
+         * Панель инструментов
+         */
+        let EditorToolbar = document.createElement('div');
+        EditorToolbar.classList.add('editor-tools', 'editor-standard-theme');
+
+        /**
+         * Кнопки инструментов
+         */
+        for (const action of this.actions) {
+            const toolButton = this.CreateActionButton(action);
+
+            EditorToolbar.append(toolButton);
+        }
+
+        EditorMainBlock.append(EditorToolbar);
 
         EditorMainBlock.append(EditorViewport);
 
