@@ -18,7 +18,9 @@ SRVR.Instantiate();
 
 /* Обработка GET-маршрута */
 SRVR.Get('/', (request, response) => {
-    response.sendFile('/demo/UI/main.html');
+    response.render('/demo/UI/main.ehtml', {
+        test: 'tested'
+    });
 
     response.end();
 });
