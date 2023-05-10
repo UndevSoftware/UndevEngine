@@ -16,3 +16,28 @@
 ```html
 <include href="./other.html">
 ```
+### Серверные переменные.
+
+Что мы делаем на сервере:
+
+```js
+Framework.Get('/', (req, res) => {
+  res.render('./main.ehtml', {
+    test: 'tested'
+  });
+  
+  return res.end();
+});
+```
+
+Что мы пишем в `main.ehtml`:
+
+```html
+<body>
+  <test>
+</body>
+```
+
+Что увидем в браузере:
+
+<img src="https://github.com/UndevSoftware/UndevEngine/blob/main/IMAGES/Variables%20Demo.png">
