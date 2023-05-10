@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '2.15.78-alpha',
+    version: '2.16.84-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -431,8 +431,10 @@ function Framework(/* Настройка окружения. dev - для раз
                 /**
                  * Удаление потенциально опасного кода
                  */
-                if (variables['use-plugins']) {
-                    delete variables['use-plugins'];
+                for (let key of Object.keys(variables)) {
+                    if (['set', 'use-plugins', 'include'].includes(key)) {
+                        delete variables[key];
+                    }
                 }
 
                 variables['usePlugins'] = usePlugins;
@@ -452,7 +454,26 @@ function Framework(/* Настройка окружения. dev - для раз
 
                 if (/(\<use\-plugins\>)/ig.test(readyToRender)) {
                     variables['usePlugins'] = true;
-                    readyToRender = readyToRender.replace(/\<include(.*?)\>/ig, '');
+                    readyToRender = readyToRender.replace(/(\<use\-plugins\>)/ig, '');
+                }
+
+                if (/(\<set name\=\"(.*?)\" value\=\"(.*?)\"\>)/ig.test(readyToRender)) {
+                    readyToRender = readyToRender.replace(/(\<set name\=\"(.*?)\" value\=\"(.*?)\"\>)/ig, (match) => {
+                        match = match.replace(/(set|name|value|\"|\=|\>|\<)/ig, '');
+                        match = match.trim();
+
+                        let name = match.split(' ')[0];
+
+                        match = match.split(' ');
+                        match.splice(0, 1);
+                        match = match.join(' ');
+
+                        let value = match;
+
+                        variables[name] = value;
+
+                        return '';
+                    });
                 }
 
                 if (/\<include(.*?)\>/ig.test(readyToRender)) {
