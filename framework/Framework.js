@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '1.13.63-alpha',
+    version: '2.13.64-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -219,7 +219,7 @@ function Framework(/* Настройка окружения. dev - для раз
          * @returns {Server}
          */
         this.Instantiate = function() {
-            if (!this.key || !this.host) {
+            if (!this.key || !this.cert) {
                 return console.error('Не задан ключ сертификата или сам сертификат.');
             }
 
