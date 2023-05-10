@@ -41,3 +41,16 @@ Framework.Get('/', (req, res) => {
 Что увидем в браузере:
 
 <img src="https://github.com/UndevSoftware/UndevEngine/blob/main/IMAGES/Variables%20Demo.png">
+
+## Изменение серверных переменных.
+
+Для создания переменной или изменения значения существующей пишем следующее:
+
+```html
+<body>
+  <set name="myName" value="myValue">
+  <myName>
+</body>
+```
+
+К сожалению скрина не будет, попробуйте сами (я интриган)
