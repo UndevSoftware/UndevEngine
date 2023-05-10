@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '1.12.59-alpha',
+    version: '1.13.63-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -409,9 +409,10 @@ function Framework(/* Настройка окружения. dev - для раз
              * @public
              * @version unstable
              * @param {string} fileName 
+             * @param {{}} variables
              * @returns {Server}
              */
-            response.render = function(fileName) {
+            response.render = function(fileName, variables) {
                 let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
                 extension = extension[extension.length - 1];
 
@@ -437,6 +438,14 @@ function Framework(/* Настройка окружения. dev - для раз
 
                         return replacment;
                     });
+                }
+
+                if (variables && typeof variables === 'object' && !Array.isArray(variables)) {
+                    for (const variable of Object.entries(variables)) {
+                        if (new RegExp('\<' + variable[0] + '\>', 'ig').test(readyToRender)) {
+                            readyToRender = readyToRender.replace(new RegExp('\<' + variable[0] + '\>', 'ig'), variable[1]);
+                        }
+                    }
                 }
 
                 response.write(readyToRender);
