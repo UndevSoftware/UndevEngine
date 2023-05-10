@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '2.15.70-alpha',
+    version: '2.15.72-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -197,6 +197,14 @@ function Framework(/* Настройка окружения. dev - для раз
          * @type {string}
          */
         this.staticPath = './';
+
+        /**
+         * Список интегрированых плагинов.
+         * 
+         * @public
+         * @type {Array}
+         */
+        this.plugins = [];
 
         /**
          * Изменение значений
@@ -415,6 +423,10 @@ function Framework(/* Настройка окружения. dev - для раз
             response.render = function(fileName, variables) {
                 let extension = fileName.split('/')[fileName.split('/').length - 1].split('.');
                 extension = extension[extension.length - 1];
+                /**
+                 * Использование плагинов при генерации вёрстки.
+                 */
+                let usePlugins = false;
 
                 if (extension !== 'ehtml') {
                     if (self.environmentStatus === 'dev') {
@@ -446,6 +458,11 @@ function Framework(/* Настройка окружения. dev - для раз
                             readyToRender = readyToRender.replace(new RegExp('\<' + variable[0] + '\>', 'ig'), variable[1]);
                         }
                     }
+                }
+
+                if (/\<use-plugins\>/ig.test(readyToRender)) {
+                    usePlugins = true;
+                    readyToRender = readyToRender.replace(/\<include(.*?)\>/ig, '');
                 }
 
                 response.write(readyToRender);
