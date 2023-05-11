@@ -82,9 +82,72 @@ function PluginManager(pluginName, pluginVersion) {
         this[paramName] = paramNewValue;
     }
 
-    this.Build = function() {
+    /**
+     * Создание стилей.
+     * 
+     * @public
+     * @param {string} selector 
+     * @param {{}} styles 
+     * @returns {PluginManager}
+     */
+    this.Style = function(selector, styles) {
+        if (!selector || typeof selector !== 'string') {
+            return console.error('Невозможно создать стили для пустого или некорректно заданого селектора!');
+        }
 
+        if (!styles || typeof styles !== 'object' || Array.isArray(styles)) {
+            return console.error('Объект со стилями не задан или задан не корректно!');
+        }
+
+        let existsSelector = this.Styles.find(style => style.selector === selector);
+
+        if (!existsSelector) {
+            this.Styles.push({
+                selector,
+                styles
+            });
+        }
+        else {
+            existsSelector.styles = styles;
+        }
+
+        return this;
+    }
+
+    /**
+     * Сборка плагина
+     * 
+     * @public
+     * @returns {PluginManager}
+     */
+    this.Build = function() {
+        const fs = require('fs');
+
+        /**
+         * Сборка CSS-стилей
+         */
+        if (this.Styles.length > 0) {
+            let cssOutput = '';
+
+            for (let style of this.Styles) {
+                cssOutput += style.selector;
+
+                let currentBlockStyle = '';
+
+                for (let styleBlock of Object.entries(style.styles)) {
+                    currentBlockStyle += styleBlock[0] + ':' + styleBlock[1] + ';';
+                }
+
+                cssOutput += '{' + currentBlockStyle + '}\n';
+            }
+
+            fs.writeFileSync('./' + this.pluginName + '.css', cssOutput);
+        }
+
+        return this;
     }
 
     return this;
 }
+
+exports.PluginManager = PluginManager;
