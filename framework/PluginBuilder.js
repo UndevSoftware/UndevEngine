@@ -149,6 +149,8 @@ function PluginManager(pluginName, pluginVersion) {
         }
 
         const outputPlugin = {
+            name: pluginName,
+            version: pluginVersion,
             Data: this.Data,
             Templates: this.Templates,
             Themes: this.Themes,

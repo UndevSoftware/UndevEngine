@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '2.18.91-alpha',
+    version: '2.19.94-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не
@@ -129,6 +129,33 @@ function Framework(/* Настройка окружения. dev - для раз
     this.plugins = [];
 
     const self = this;
+
+    /**
+     * Интегрирование плагинов в движок
+     * 
+     * @public
+     * @param {{}} plugin 
+     * @returns {Framework}
+     */
+    this.Intagrate = function (plugin, asName) {
+        let name = plugin.name;
+
+        if (asName && typeof asName === 'string') {
+            name = asName;
+        }
+
+        if (this.plugins.find(plug => plug.name === name)) {
+            if (this.environmentStatus == 'prod') {
+                return console.error('В prod режиме невозможно переписать плагин!');
+            }
+            else {
+                this.plugins.find(plug => plug.name === name) = plugin;
+            }
+        }
+        else {
+            this.plugins.push(plugin);
+        }
+    }
 
     /**
      * Компонент Серверной оболочки.
