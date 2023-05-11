@@ -141,7 +141,11 @@ function PluginManager(pluginName, pluginVersion) {
                 cssOutput += '{' + currentBlockStyle + '}\n';
             }
 
-            fs.writeFileSync('./' + this.pluginName + '.css', cssOutput);
+            if (!fs.existsSync('./' + this.pluginName)) {
+                fs.mkdir('./' + this.pluginName, () => {});
+            }
+
+            fs.writeFileSync('./' + this.pluginName + '/' + this.pluginName + '.css', cssOutput);
         }
 
         return this;
