@@ -148,6 +148,15 @@ function PluginManager(pluginName, pluginVersion) {
             fs.writeFileSync('./' + this.pluginName + '/' + this.pluginName + '.css', cssOutput);
         }
 
+        const outputPlugin = {
+            Data: this.Data,
+            Templates: this.Templates,
+            Themes: this.Themes,
+            Styles: this.Styles
+        }
+
+        fs.writeFileSync('./' + this.pluginName + '/' + this.pluginName + '.js', "const " + this.pluginName + " = " + JSON.stringify(outputPlugin, null, '\t') + '\n\nexports.' + this.pluginName + ' = ' + this.pluginName + ';');
+
         return this;
     }
 
