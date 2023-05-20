@@ -69,6 +69,11 @@ function Editor(
             name: 'strikethrough',
             icon: 'fa-strikethrough',
             title: 'Зачёркнутый'
+        },
+        {
+            name: 'createLink',
+            icon: 'fa-link',
+            title: 'Добавить ссылку'
         }
     ]);
 
@@ -96,6 +101,14 @@ function Editor(
      */
     this.editorWrapper = document.createElement('div');
 
+    /**
+     * Модальное окно для вставки ссылок.
+     * 
+     * @public
+     * @type {Element}
+     */
+    this.editorModalWindow = document.createElement('div');
+
     const self = this;
 
     /**
@@ -115,7 +128,14 @@ function Editor(
         if (action.style) button.dataset.style = action.style;
         if (action.tag) button.dataset.style = action.tag;
 
-        button.addEventListener("click", this.HandleAction);
+        if (action.name !== 'createLink') {
+            button.addEventListener("click", this.HandleAction);
+        }
+        else {
+            button.addEventListener('click', () => {
+                document.querySelector('.editor-modalwin').style.display = "flex";
+            })
+        }
 
         i.classList.add("fa", action.icon);
         button.append(i);
@@ -134,27 +154,19 @@ function Editor(
         self.editorViewport.focus();
 
         switch (action) {
-            case "insertImageByUrl":
-                const imageUrl = prompt("Insert the image URL");
+            // case "insertImageByFile":
+            //     const fileUploadInput = document.querySelector("#image-upload-input");
 
-                if (imageUrl) {
-                    document.execCommand("insertImage", false, imageUrl);
-                }
+            //     fileUploadInput.click();
 
-                break;
-            case "insertImageByFile":
-                const fileUploadInput = document.querySelector("#image-upload-input");
+            //     fileUploadInput.onchange = () => {
+            //         const [file] = fileUploadInput.files;
 
-                fileUploadInput.click();
+            //         if (file)
+            //             document.execCommand("insertImage", false, URL.createObjectURL(file));
+            //     };
 
-                fileUploadInput.onchange = () => {
-                    const [file] = fileUploadInput.files;
-
-                    if (file)
-                        document.execCommand("insertImage", false, URL.createObjectURL(file));
-                };
-
-                break;
+            //     break;
             default:
                 document.execCommand(action, false);
                 break;
@@ -185,6 +197,9 @@ function Editor(
          */
         this.editorToolBar.classList.add('editor-tools', 'editor-standard-theme');
 
+        this.editorModalWindow.classList.add('editor-modalwin');
+        this.editorModalWindow.innerHTML = '<div class="editor-modal editor-standard-theme"><h2>Вставьте ссылку:</h2><input type="text" placeholder="Название" id="name"><input type="text" placeholder="Ссылка" id="link"><div id="link__submit">Вставить</div></div>';
+
         /**
          * Кнопки инструментов
          */
@@ -213,7 +228,21 @@ function Editor(
             this.editorToolBar.append(actionButton);
         }
 
+        document.body.append(this.editorModalWindow);
         this.editorWrapper.append(this.editorToolBar, this.editorViewport);
+
+        document.querySelector('#link__submit').addEventListener('click', () => {
+            const name = document.querySelector('#name').value;
+            const url = document.querySelector('#link').value;
+
+            if (name.length > 0) {
+                if (url.length > 0 && /((https|http)\:\/\/(.*?)\.(.*?))/.test(url)) {
+                    document.querySelector('.editor-viewport').innerHTML += '<a href="' + url  +'">' + name + '</a>';
+                }
+            }
+
+            document.querySelector('.editor-modalwin').style.display = "none";
+        });
 
         if (inElement && inElement instanceof Element) {
             if (!element.contains(inElement)) {
