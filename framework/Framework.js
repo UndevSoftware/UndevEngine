@@ -29,7 +29,7 @@ const Meta = {
      * @readonly
      * @type {string}
      */
-    version: '2.19.94-alpha',
+    version: '2.20.94-alpha',
     /**
      * Официальным и единственных распространителем UndevEngine и всех его
      * компонентов является UndevSoftware. Любые модификации фреймворка не

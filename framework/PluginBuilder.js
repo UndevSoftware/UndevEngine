@@ -115,6 +115,16 @@ function PluginManager(pluginName, pluginVersion) {
     }
 
     /**
+     * Добавление шаблона в проект
+     * 
+     * @param {*} name 
+     * @param {*} HTMLcode 
+     */
+    this.Template = function(name, HTMLcode) {
+
+    }
+
+    /**
      * Сборка плагина
      * 
      * @public
@@ -148,6 +158,9 @@ function PluginManager(pluginName, pluginVersion) {
             fs.writeFileSync('./' + this.pluginName + '/' + this.pluginName + '.css', cssOutput);
         }
 
+        /**
+         * Сборка остальной информации о плагине
+         */
         const outputPlugin = {
             name: pluginName,
             version: pluginVersion,
