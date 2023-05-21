@@ -68,7 +68,7 @@
 }
 
 .editor-tools > button {
-    width: 30px;
+    min-width: 30px;
     height: 30px;
     cursor: pointer;
     margin-right: 10px;
@@ -79,4 +79,19 @@
     border-radius: 6px;
     background: #2e2e2e;
     color: rgb(255, 255, 255);
+    padding: 0 5px;
+}
+
+.tool-button {
+    display: flex;
+}
+
+.right-line {
+    border-right: 1px solid rgba(255, 255, 255, .6);
+    padding-right: 5px;
+}
+
+.button-name {
+    margin-left: 5px;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }

@@ -74,6 +74,11 @@ function Editor(
             name: 'createLink',
             icon: 'fa-link',
             title: 'Добавить ссылку'
+        },
+        {
+            name: 'createHeader',
+            icon: 'fa-heading',
+            title: 'Заголовок'
         }
     ]);
 
@@ -118,12 +123,15 @@ function Editor(
      * @returns {Element}
      */
     this.CreateActionButton = function(action) {
-        const button = document.createElement("button");
-        const i = document.createElement("i");
+        const button = document.createElement("button"),
+              i = document.createElement("i"),
+              name = document.createElement('span');
 
-        button.classList.add("action");
-        button.title = action.title;
+        button.classList.add("tool-button", "action");
         button.dataset.action = action.name;
+
+        name.classList.add("button-name");
+        name.textContent = action.title;
 
         if (action.style) button.dataset.style = action.style;
         if (action.tag) button.dataset.style = action.tag;
@@ -137,8 +145,9 @@ function Editor(
             })
         }
 
-        i.classList.add("fa", action.icon);
+        i.classList.add("fa", action.icon, "right-line");
         button.append(i);
+        button.append(name);
 
         return button;
     }
@@ -154,6 +163,14 @@ function Editor(
         self.editorViewport.focus();
 
         switch (action) {
+            case "createHeader":
+                const heading = document.createElement('h1');
+                heading.textContent = "Ваш заголовок";
+                heading.contentEditable = true;
+
+                document.querySelector('.editor-viewport').append(heading);
+
+                break;
             // case "insertImageByFile":
             //     const fileUploadInput = document.querySelector("#image-upload-input");
 
